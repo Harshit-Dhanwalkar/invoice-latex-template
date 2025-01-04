@@ -1,0 +1,300 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{invoice}[2025/01/03 Custom Invoice Template]
+
+% Set up page size and margins
+\RequirePackage{array, xcolor,colortbl, tikz, fancyhdr, graphicx, multido, float}
+\RequirePackage{tfrupee}
+
+% Colors
+\definecolor{lightblue}{RGB}{70,130,180}
+\definecolor{lightgray}{gray}{0.9}
+
+% set page geometry
+\usepackage[top=2in, bottom=1in, left=1.2in, right=1.2in]{geometry}
+% \usepackage[verbose=true,letterpaper]{geometry}
+% \AtBeginDocument{
+%   \newgeometry{
+%     textheight=9in,
+%     textwidth=5.5in,
+%     top=1in,
+%     headheight=12pt,
+%     headsep=25pt,
+%     footskip=30pt
+%   }
+  % \@ifpackageloaded{fullpage}
+  %   {\PackageWarning{invoice-error}{fullpage package not allowed! Overwriting formatting.}}
+  %   {}
+%}
+
+% Load fonts (you can use your preferred font)
+% \RequirePackage{fontspec}
+% \setmainfont{Times New Roman}
+
+% declare final option, which creates camera-ready copy
+\newif\if@invoicefinal
+\@invoicefinalfalse
+\DeclareOption{final}{
+  \@invoicefinaltrue
+}
+\ProcessOptions\relax
+
+% determine whether this is an anonymized submission
+% \newif\if@submission\@submissiontrue
+% \if@invoicefinal\@submissionfalse\fi
+% \if@invoicet\@submissionfalse\fi
+%
+% % fonts
+% \renewcommand{\rmdefault}{ptm}
+% \renewcommand{\sfdefault}{phv}
+
+% title
+\newcommand{\invoicetitle}[1]{
+    \begin{center}
+      \textbf{\LARGE #1}
+    \end{center}
+}
+
+% Header
+\setlength{\headheight}{22.93335pt} % Fix headheight warning
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{\textit{\huge Company Name}}}
+\fancyhead[R]{\textbf{\large INVOICE \#101} \\ \small \invoiceyear}
+
+\newcommand{\project}[7]{%
+  \begin{tikzpicture}
+    % Client Details
+    \node[anchor=west, text width=10cm, align=left] at (0,0) {
+        \textcolor{blue!90}{\textbf{\Large Client:}} \\[1mm]
+        #1 \\ [1mm]
+        #2 \\ [1mm]
+        \textcolor{blue!90}{\textbf{\large Email:}} #3 \\ [1mm]
+        \textcolor{blue!90}{\textbf{\large Phone:}} #4 \\ [1mm]
+    };
+    
+    % Amount
+    \node[anchor=west] at (0,-3) {\textbf{\huge \$#5}};
+    
+    % L-shaped arrow
+    \draw[->, ultra thick, blue!90] (4,-3) -- (6.5,-3) -- (6.5,0.5) -- (8.5,0.5);
+    
+    % Payable To Details
+    \node[anchor=west, text width=6cm, align=left] at (9,0) {
+        \textcolor{blue!90}{\textbf{\Large Payable To:}} \\[1mm]
+        #6 \\[1mm]
+        #7 \\[1mm]
+    };
+  \end{tikzpicture}
+}
+
+% change this every year and location
+\newcommand{\invoiceyear}{2025}
+\newcommand{\invoicelocation}{India}
+
+% Holes on the left and right, respectively, in the odd and even pages:
+\usepackage{blindtext}
+\AddToHook{shipout/background}{%
+ \ifodd\value{page}
+ \begin{tikzpicture}[overlay,remember picture,every node/.style={circle, minimum height=5mm,minimum width=5mm,draw, xshift = 6mm}]
+ \draw (current page.west) node[yshift = 30mm]{};
+ \draw (current page.west) node[yshift = -30mm]{};
+ \end{tikzpicture}%
+ \else
+ \begin{tikzpicture}[overlay,remember picture,every node/.style={circle, minimum height=5mm,minimum width=5mm,draw, xshift = -6mm}]
+ \draw (current page.east) node[yshift = 30mm]{};
+ \draw (current page.east) node[yshift = -30mm]{};
+ \end{tikzpicture}%
+ \fi
+}
+
+% \widowpenalty=10000
+% \clubpenalty=10000
+% \flushbottom
+% \sloppy
+
+% font sizes with reduced leading
+\renewcommand{\normalsize}{%
+  \@setfontsize\normalsize\@xpt\@xipt
+  \abovedisplayskip      7\p@ \@plus 2\p@ \@minus 5\p@
+  \abovedisplayshortskip \z@ \@plus 3\p@
+  \belowdisplayskip      \abovedisplayskip
+  \belowdisplayshortskip 4\p@ \@plus 3\p@ \@minus 3\p@
+}
+\normalsize
+\renewcommand{\small}{%
+  \@setfontsize\small\@ixpt\@xpt
+  \abovedisplayskip      6\p@ \@plus 1.5\p@ \@minus 4\p@
+  \abovedisplayshortskip \z@  \@plus 2\p@
+  \belowdisplayskip      \abovedisplayskip
+  \belowdisplayshortskip 3\p@ \@plus 2\p@   \@minus 2\p@
+}
+\renewcommand{\footnotesize}{\@setfontsize\footnotesize\@ixpt\@xpt}
+\renewcommand{\scriptsize}{\@setfontsize\scriptsize\@viipt\@viiipt}
+\renewcommand{\tiny}{\@setfontsize\tiny\@vipt\@viipt}
+\renewcommand{\large}{\@setfontsize\large\@xiipt{14}}
+\renewcommand{\Large}{\@setfontsize\Large\@xivpt{16}}
+\renewcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{20}}
+\renewcommand{\huge}{\@setfontsize\huge\@xxpt{23}}
+\renewcommand{\Huge}{\@setfontsize\Huge\@xxvpt{28}}
+
+% float placement
+\renewcommand{\topfraction      }{0.85}
+\renewcommand{\bottomfraction   }{0.4}
+\renewcommand{\textfraction     }{0.1}
+\renewcommand{\floatpagefraction}{0.7}
+
+\newlength{\@invoiceabovecaptionskip}\setlength{\@invoiceabovecaptionskip}{7\p@}
+\newlength{\@invoicebelowcaptionskip}\setlength{\@invoicebelowcaptionskip}{\z@}
+
+\setlength{\abovecaptionskip}{\@invoiceabovecaptionskip}
+\setlength{\belowcaptionskip}{\@invoicebelowcaptionskip}
+
+% Table
+% Command to generate the invoice table
+\newcommand{\invoicetable}[1]{
+    \noindent
+    \makebox[\textwidth]{
+        \renewcommand{\arraystretch}{1.5} % Adjust row height
+        \begin{tabular}{p{0.12\textwidth} p{0.45\textwidth} p{0.1\textwidth} p{0.15\textwidth} p{0.15\textwidth}}
+            \rowcolor{lightgray}
+            \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Discount} & \textbf{Amount} \\
+            #1 % Insert rows of data here
+            \rowcolor{lightgray}
+            \textbf{} & \textbf{} & \multicolumn{2}{r}{\textbf{Total Amount:}} & \textbf{\$212.50} \\
+            %\textbf{} & \textbf{} & \multicolumn{2}{r}{\textbf{Total Amount:}} & \textbf{\${}500.00} \\ 
+            \rowcolor{lightgray}
+            \textbf{} & \textbf{} & \multicolumn{2}{r}{\textbf{Total Discount:}} & \textbf{\${}69.00} \\ 
+            \rowcolor{lightgray}
+            \textbf{} & \textbf{} & \multicolumn{2}{r}{\textbf{Paid:}} & \textbf{\${}0.00} \\ 
+            \rowcolor{lightgray}
+            \textbf{} & \textbf{} & \multicolumn{2}{r}{\textbf{Balance Due:}} & \textbf{\${}500.00} \\
+        \end{tabular}
+    }
+}
+
+% swap above/belowcaptionskip lengths for tables
+\renewenvironment{table}
+  {\setlength{\abovecaptionskip}{\@invoicebelowcaptionskip}%
+   \setlength{\belowcaptionskip}{\@invoiceabovecaptionskip}%
+   \@float{table}}
+  {\end@float}
+
+% footnote formatting
+% \setlength{\footnotesep }{6.65\p@}
+% \setlength{\skip\footins}{9\p@ \@plus 4\p@ \@minus 2\p@}
+% \renewcommand{\footnoterule}{\kern-3\p@ \hrule width 12pc \kern 2.6\p@}
+% \setcounter{footnote}{0}
+
+% create title
+\providecommand{\maketitle}{}
+\renewcommand{\maketitle}{%
+  \par
+  \begingroup
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}}
+    % for perfect author name centering
+    \renewcommand{\@makefnmark}{\hbox to \z@{$^{\@thefnmark}$\hss}}
+    % The footnote-mark was overlapping the footnote-text,
+    % added the following to fix this problem               (MK)
+    \long\def\@makefntext##1{%
+      \parindent 1em\noindent
+      \hbox to 1.8em{\hss $\m@th ^{\@thefnmark}$}##1
+    }
+    \thispagestyle{empty}
+    \@maketitle
+  \endgroup
+  \let\maketitle\relax
+  \let\thanks\relax
+}
+
+% Company information
+\providecommand{\companyinfo}[3]{%
+  \noindent \textbf{Company:} #1 \\
+  \textbf{Address:} #2 \\
+  \textbf{Phone:} #3 \vspace{1em} \\
+}
+
+% Recipient information
+\providecommand{\recipient}[4]{%
+  \noindent \textbf{Recipient:} #1 \\
+  \textbf{Address:} #2 \\
+  \textbf{Email:} #3 \\
+  \textbf{Phone:} #4 \vspace{1em} \\
+}
+
+% stamps for Recived and Balance
+\newcommand{\received}{%
+  \begin{minipage}{0.43\textwidth}\sffamily
+    \begin{tikzpicture}[overlay]
+      \draw[green!50!black, 
+            ultra thick, 
+            rotate = 30, 
+            rounded corners] (0.4,-2.5) rectangle (4.5,-1);
+      \node[green!50!black, 
+            rotate = 30] at (3,-0.3) {\Huge\bfseries Received};
+    \end{tikzpicture}\vspace{-1cm}
+    \quad Amount is successfully deposited.
+  \end{minipage}\hspace{0.5cm}\vspace{0.5cm}
+}
+\newcommand{\balance}{%
+  \begin{minipage}{0.43\textwidth}\sffamily
+    \begin{tikzpicture}[overlay]
+      \draw[red!90!black, 
+            ultra thick, 
+            rotate = 30, 
+            rounded corners] (0.7,-2.5) rectangle (4.2,-1);
+      \node[red!90!black, 
+            rotate = 30] at (3,-0.3) {\Huge\bfseries Balance};
+          \end{tikzpicture}\vspace{-1cm}
+    \quad Your payment is balance.
+  \end{minipage}\hspace{0.5cm}\vspace{0.5cm}
+}
+
+\if@invoicefinal
+  \newcommand{\@noticestring}{
+    \@invoiceordinal\/ Hello from author Harshit!
+    (Invoice \@invoiceyear, \@invoicelocation.)
+  }
+\else
+  \newcommand{\@noticestring}{%
+    Submitted to \@invoiceordinal\/ Invoice in latex
+    (\@invoiceyear)
+  }
+
+  % hide the acknowledgements
+  \NewEnviron{hide}{}
+  \let\ack\hide
+  \let\endack\endhide
+
+  % line numbers for submission
+  \RequirePackage{lineno}
+  \linenumbers
+
+  % fix incompatibilities between lineno and amsmath, if required, by
+  % transparently wrapping linenomath environments around amsmath
+  % environments
+  \AtBeginDocument{%
+    \@ifpackageloaded{amsmath}{%
+      \newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+        \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+        \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+        \renewenvironment{#1}%
+                        {\linenomath\csname old#1\endcsname}%
+                        {\csname oldend#1\endcsname\endlinenomath}%
+      }%
+      \newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+        \patchAmsMathEnvironmentForLineno{#1}%
+        \patchAmsMathEnvironmentForLineno{#1*}%
+      }%
+      \patchBothAmsMathEnvironmentsForLineno{equation}%
+      \patchBothAmsMathEnvironmentsForLineno{align}%
+      \patchBothAmsMathEnvironmentsForLineno{flalign}%
+      \patchBothAmsMathEnvironmentsForLineno{alignat}%
+      \patchBothAmsMathEnvironmentsForLineno{gather}%
+      \patchBothAmsMathEnvironmentsForLineno{multline}%
+    }
+    {}
+  }
+\fi
+%\fi
+
+\endinput

@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage[final]{invoice}
+
+\begin{document}
+
+%\invoicetitle{Invoice}
+
+%\clientinfo{Company}{123 Business St, \invoicelocation}{+1 234 567 890}
+
+\project{Sherlock Homes}{221b Baker Streets}{sherlockh@email.com}{+91 987 654 321}{500}{James Bond}{bondy47@email.com}
+
+\vspace{1cm}
+
+\invoicetable{
+    2015/4/11 & Laptop & 2 & \rupee20 & \rupee100.00 \\ 
+    2015/4/11 & Computer & 1.25 & \rupee96 & \rupee62.50 \\ 
+    2015/4/11 & Tires & 0.5 & \rupee69 & \rupee25.00 \\
+    2015/4/11 & Car & 0.5 & \rupee69 & \rupee25.00 \\
+}
+
+\received
+\balance
+
+\end{document}
